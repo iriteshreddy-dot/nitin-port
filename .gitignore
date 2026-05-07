@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.claude/
+*.json.bak
+gemini-code-*.js
+gemini-code-*.json
+nitin-reel-scroll-prompt.md
+html/
+index.html
+ChatGPT*.png
+Countdown.jpg
+Reel.png
+.DS_Store
+*.local
