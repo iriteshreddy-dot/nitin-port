@@ -6,14 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "remotion": "npx remotion studio src/remotion/Root.jsx",
+    "render": "npx remotion render src/remotion/Root.jsx LoadingComposition public/loading.mp4 --codec=h264 --crf=16"
   },
   "dependencies": {
+    "@remotion/animation-utils": "^4.0.468",
+    "@remotion/cli": "^4.0.468",
+    "@remotion/player": "^4.0.468",
+    "@remotion/transitions": "^4.0.468",
     "@studio-freight/lenis": "^1.0.42",
     "gsap": "^3.12.5",
     "lucide-react": "^0.400.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "remotion": "^4.0.468",
     "three": "^0.160.0"
   },
   "devDependencies": {

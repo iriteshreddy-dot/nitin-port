@@ -35,13 +35,14 @@ export default function Pipeline() {
           </h2>
         </div>
 
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', gap: 0, minHeight: 580 }}>
+        <div className="pipeline-flex" style={{ position: 'relative', display: 'flex', justifyContent: 'center', gap: 0, minHeight: 580 }}>
           {roles.map((role, i) => (
             <React.Fragment key={role.title}>
               <div
                 ref={el => colsRef.current[i] = el}
                 className={`spotlight-col${i === 0 ? ' spotlight-active' : ''}`}
                 onMouseEnter={() => activate(i)}
+                onClick={() => activate(i)}
                 style={{ flex: 1, maxWidth: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', cursor: 'none', padding: '0 20px' }}
               >
                 {/* Beam */}
@@ -79,7 +80,7 @@ export default function Pipeline() {
                   </ul>
                 </div>
               </div>
-              {i < 2 && <div style={{ width: 1, background: 'var(--separator)', alignSelf: 'stretch', marginTop: 100 }} />}
+              {i < 2 && <div className="pipeline-divider" style={{ width: 1, background: 'var(--separator)', alignSelf: 'stretch', marginTop: 100 }} />}
             </React.Fragment>
           ))}
         </div>
@@ -110,6 +111,13 @@ export default function Pipeline() {
           opacity: 1 !important; transform: translateY(0) !important;
           border-color: rgba(232,213,163,0.15) !important;
           background: rgba(232,213,163,0.025) !important;
+        }
+        @media (max-width: 768px) {
+          .pipeline-flex { flex-direction: column !important; align-items: center !important; gap: 40px !important; min-height: auto !important; }
+          .pipeline-divider { display: none !important; }
+          .spotlight-col { max-width: 100% !important; width: 100% !important; }
+          .spotlight-card { opacity: 1 !important; transform: none !important; border-color: rgba(232,213,163,0.15) !important; background: rgba(232,213,163,0.025) !important; }
+          .spotlight-beam { display: none; }
         }
       `}</style>
     </section>

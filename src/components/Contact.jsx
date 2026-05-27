@@ -108,7 +108,7 @@ export default function Contact() {
         <Divider/>
 
         {/* DIRECTOR + CAMERA row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, padding: '22px 0' }}>
+        <div className="contact-row-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, padding: '22px 0' }}>
           <div>
             <div style={labelStyle}>DIRECTOR</div>
             <div style={valueStyle}>Nitin Gadila</div>
@@ -137,7 +137,7 @@ export default function Contact() {
               color: 'var(--gold)',
               letterSpacing: '0.04em',
               textDecoration: 'none',
-              cursor: 'none',
+              cursor: 'pointer',
             }}
           >
             contact@nitingadila.com
@@ -146,9 +146,9 @@ export default function Contact() {
           {/* Social links */}
           <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap' }}>
             {[
-              { label: 'LinkedIn',  href: 'https://linkedin.com/in/nitingadila' },
-              { label: 'Instagram', href: 'https://instagram.com/nitingadila' },
-              { label: 'Phone',     href: 'tel:+91XXXXXXXXXX' },
+              { label: 'LinkedIn',  href: 'https://www.linkedin.com/in/nitin-gadila-7949a41a9/' },
+              { label: 'Instagram', href: 'https://www.instagram.com/nitin_gadila/' },
+              { label: '+91 7330893118', href: 'tel:+917330893118' },
             ].map(l => (
               <a
                 key={l.label}
@@ -164,7 +164,7 @@ export default function Contact() {
                   border: '1px solid rgba(232,213,163,0.2)',
                   color: 'rgba(245,240,232,0.55)',
                   textDecoration: 'none',
-                  cursor: 'none',
+                  cursor: 'pointer',
                   transition: 'all 0.3s ease',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor='var(--gold)'; e.currentTarget.style.color='var(--gold)'; }}
@@ -179,7 +179,7 @@ export default function Contact() {
         <Divider thick/>
 
         {/* DATE | SCENE | TAKE bottom row */}
-        <div style={{
+        <div className="contact-row-3" style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
           borderBottom: '1px solid rgba(255,255,255,0.12)',
@@ -219,7 +219,7 @@ export default function Contact() {
               background: 'var(--gold)',
               color: '#000',
               textDecoration: 'none',
-              cursor: 'none',
+              cursor: 'pointer',
               transition: 'all 0.3s ease',
               border: '2px solid var(--gold)',
             }}
@@ -249,6 +249,13 @@ export default function Contact() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .contact-row-2 { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .contact-row-3 { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

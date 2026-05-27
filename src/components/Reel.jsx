@@ -1,28 +1,63 @@
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-const projects = [
-  { title: 'Pushpa 2\nThe Rule', role: 'VFX', studio: 'Haarika & Hassine Creations', bg: 'linear-gradient(135deg,#1a1208,#2a1a06)', border: '#2a2010', offset: false },
-  { title: 'Martin',            role: 'VFX', studio: 'Halohues Studio',              bg: 'linear-gradient(135deg,#080d1a,#0d1525)', border: '#10182a', offset: true  },
-  { title: 'HIT: The\nThird Case', role: 'VFX', studio: 'Halohues Studio',           bg: 'linear-gradient(135deg,#0a0a0a,#141414)', border: '#1e1e1e', offset: false },
-  { title: 'Thug Life',         role: 'VFX', studio: 'Production House',             bg: 'linear-gradient(135deg,#0d0804,#1a1006)', border: '#2a1800', offset: true  },
-];
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 
 export default function Reel() {
-  const framesRef = useRef([]);
+  const videoRef     = useRef(null);
+  const hideTimer    = useRef(null);
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    framesRef.current.forEach((el, i) => {
-      if (!el) return;
-      gsap.fromTo(el, { opacity: 0, y: 40 }, {
-        opacity: 1, y: 0,
-        duration: 0.9, delay: i * 0.1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 90%' },
-      });
-    });
+  const [playing,      setPlaying]      = useState(false);
+  const [muted,        setMuted]        = useState(false);
+  const [currentTime,  setCurrentTime]  = useState(0);
+  const [duration,     setDuration]     = useState(0);
+  const [showControls, setShowControls] = useState(false);
+  const [started,      setStarted]      = useState(false);
+
+  const fmt = (t) => {
+    if (!t || isNaN(t)) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setPlaying(true); setStarted(true); }
+    else          { v.pause(); setPlaying(false); }
   }, []);
+
+  const toggleMute = useCallback((e) => {
+    e.stopPropagation();
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  }, []);
+
+  const handleSeek = useCallback((e) => {
+    e.stopPropagation();
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = parseFloat(e.target.value);
+    setCurrentTime(v.currentTime);
+  }, []);
+
+  const handleFullscreen = useCallback((e) => {
+    e.stopPropagation();
+    const v = videoRef.current;
+    if (!v) return;
+    if (document.fullscreenElement) document.exitFullscreen();
+    else v.requestFullscreen?.();
+  }, []);
+
+  const revealControls = useCallback(() => {
+    setShowControls(true);
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setShowControls(false), 2800);
+  }, []);
+
+  useEffect(() => () => clearTimeout(hideTimer.current), []);
+
+  const progress = duration ? (currentTime / duration) * 100 : 0;
 
   return (
     <section id="reel" style={{ background: 'var(--bg)' }}>
@@ -34,88 +69,164 @@ export default function Reel() {
           </h2>
         </div>
 
-        {/* Showreel frame */}
-        <div className="reveal" style={{
-          position: 'relative', width: '100%', maxWidth: 900, margin: '0 auto 80px',
-          aspectRatio: '16/9', border: '1px solid rgba(232,213,163,0.15)', overflow: 'hidden',
-          boxShadow: '0 0 80px rgba(232,213,163,0.08), 0 0 200px rgba(232,213,163,0.04)',
-        }}>
-          {/* Film strip top/bottom */}
+        {/* Video frame */}
+        <div
+          className="reveal"
+          onClick={togglePlay}
+          onMouseMove={revealControls}
+          onMouseEnter={revealControls}
+          onMouseLeave={() => { clearTimeout(hideTimer.current); setShowControls(false); }}
+          style={{
+            position: 'relative',
+            width: '100%', maxWidth: 900,
+            margin: '0 auto 80px',
+            aspectRatio: '16/9',
+            border: '1px solid rgba(232,213,163,0.15)',
+            overflow: 'hidden',
+            cursor: playing && !showControls ? 'none' : 'pointer',
+            boxShadow: '0 0 80px rgba(232,213,163,0.08), 0 0 200px rgba(232,213,163,0.04)',
+          }}
+        >
+          {/* ── Film strips top / bottom ── */}
           {['top', 'bottom'].map(pos => (
             <div key={pos} style={{
               position: 'absolute', [pos]: 0, left: 0, right: 0, height: 6, zIndex: 3,
-              background: 'repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(232,213,163,0.15) 18px, rgba(232,213,163,0.15) 20px)',
+              background: 'repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(232,213,163,0.18) 18px, rgba(232,213,163,0.18) 20px)',
+              pointerEvents: 'none',
             }} />
           ))}
-          <div style={{
-            position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 60%, rgba(8,8,8,0.6) 100%)',
-            zIndex: 2, pointerEvents: 'none',
-          }} />
-          <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div className="play-btn" style={{ width: 72, height: 72, borderRadius: '50%', border: '2px solid var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'none', background: 'rgba(232,213,163,0.05)', transition: 'all 0.3s ease' }}>
-              <svg viewBox="0 0 24 24" style={{ width: 28, height: 28, fill: 'var(--gold)', marginLeft: 4 }}>
-                <polygon points="5,3 19,12 5,21"/>
-              </svg>
-            </div>
-            <p style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,240,232,0.3)' }}>Showreel 2025</p>
-          </div>
-        </div>
 
-        {/* Projects grid */}
-        <div className="section-label reveal" style={{ marginBottom: 32 }}>Featured Projects</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginTop: 48 }}>
-          {projects.map((p, i) => (
-            <div
-              key={i}
-              ref={el => framesRef.current[i] = el}
-              className="project-frame"
-              data-tilt
-              style={{ marginTop: p.offset ? 32 : 0, opacity: 0 }}
-              onMouseMove={e => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width - 0.5;
-                const y = (e.clientY - rect.top) / rect.height - 0.5;
-                e.currentTarget.style.transform = `translateY(-6px) perspective(400px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transition = 'transform 0.5s ease, border-color 0.4s ease';
-                e.currentTarget.style.transform = `translateY(${p.offset ? '-6px' : '0'})`;
-                setTimeout(() => { if (e.currentTarget) e.currentTarget.style.transition = ''; }, 500);
-              }}
-            >
-              <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(160deg, #141414, #0a0a0a)' }}>
-                <div style={{ width: '60%', height: '70%', background: p.bg, border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 9, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.15)', textTransform: 'uppercase' }}>Poster</span>
-                </div>
-              </div>
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 16px', zIndex: 3, transform: 'translateY(8px)', transition: 'transform 0.4s ease' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, letterSpacing: '0.06em', color: 'var(--text)', lineHeight: 1.1, textTransform: 'uppercase', whiteSpace: 'pre-line' }}>{p.title}</div>
-                <div style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginTop: 4 }}>{p.role}</div>
-                <div style={{ fontFamily: 'var(--font-body)', fontSize: 9, color: 'rgba(245,240,232,0.3)', marginTop: 2, letterSpacing: '0.1em' }}>{p.studio}</div>
-              </div>
+          {/* ── Film strips left / right (small) ── */}
+          {['left', 'right'].map(side => (
+            <div key={side} style={{
+              position: 'absolute', [side]: 0, top: 6, bottom: 6,
+              width: 18, zIndex: 3,
+              background: 'rgba(0,0,0,0.55)',
+              borderRight: side === 'left'  ? '1px solid rgba(232,213,163,0.1)' : 'none',
+              borderLeft:  side === 'right' ? '1px solid rgba(232,213,163,0.1)' : 'none',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'space-evenly',
+              padding: '10px 0',
+              pointerEvents: 'none',
+            }}>
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} style={{
+                  width: 9, height: 13, borderRadius: 2,
+                  border: '1px solid rgba(232,213,163,0.13)',
+                  background: '#020202',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.9)',
+                }} />
+              ))}
             </div>
           ))}
+
+          {/* ── Video element ── */}
+          <video
+            ref={videoRef}
+            src="https://drive.google.com/uc?id=1gS-kCMpKHeXf1C_KVBWwKgEnTKAv58Kj&export=download"
+            playsInline
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 1 }}
+            onTimeUpdate={e => setCurrentTime(e.target.currentTime)}
+            onLoadedMetadata={e => setDuration(e.target.duration)}
+            onEnded={() => { setPlaying(false); setShowControls(true); }}
+          />
+
+          {/* ── Initial overlay ── */}
+          {!started && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, background: 'rgba(0,0,0,0.38)' }}>
+              <div style={{ width: 72, height: 72, borderRadius: '50%', border: '2px solid var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(232,213,163,0.05)' }}>
+                <svg viewBox="0 0 24 24" style={{ width: 28, height: 28, fill: 'var(--gold)', marginLeft: 4 }}>
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+              </div>
+              <p style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,240,232,0.3)', margin: 0 }}>Showreel 2025</p>
+            </div>
+          )}
+
+          {/* ── Custom controls bar ── */}
+          {started && (
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 8,
+                padding: '24px 20px 10px',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%)',
+                transform: showControls || !playing ? 'translateY(0)' : 'translateY(100%)',
+                transition: 'transform 0.3s ease',
+              }}
+            >
+              {/* Progress bar */}
+              <div style={{ position: 'relative', height: 3, background: 'rgba(255,255,255,0.15)', marginBottom: 10, cursor: 'pointer' }}>
+                {/* Filled */}
+                <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${progress}%`, background: 'var(--gold)', pointerEvents: 'none' }} />
+                {/* Scrubber */}
+                <input
+                  type="range" min={0} max={duration || 100} step={0.1}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  style={{
+                    position: 'absolute', inset: '-6px 0',
+                    width: '100%', height: 'calc(100% + 12px)',
+                    opacity: 0, cursor: 'pointer', margin: 0,
+                  }}
+                />
+                {/* Thumb dot */}
+                <div style={{
+                  position: 'absolute', top: '50%',
+                  left: `${progress}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: 10, height: 10, borderRadius: '50%',
+                  background: 'var(--gold)',
+                  boxShadow: '0 0 6px rgba(232,213,163,0.6)',
+                  pointerEvents: 'none',
+                }} />
+              </div>
+
+              {/* Controls row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                {/* Play / Pause */}
+                <button onClick={togglePlay} style={btnStyle}>
+                  {playing
+                    ? <svg viewBox="0 0 24 24" style={iconStyle}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    : <svg viewBox="0 0 24 24" style={iconStyle}><polygon points="5,3 19,12 5,21"/></svg>
+                  }
+                </button>
+
+                {/* Time */}
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, letterSpacing: '0.12em', color: 'rgba(245,240,232,0.55)', whiteSpace: 'nowrap' }}>
+                  {fmt(currentTime)} / {fmt(duration)}
+                </span>
+
+                <div style={{ flex: 1 }} />
+
+                {/* Mute */}
+                <button onClick={toggleMute} style={btnStyle}>
+                  {muted
+                    ? <svg viewBox="0 0 24 24" style={iconStyle} fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                    : <svg viewBox="0 0 24 24" style={iconStyle} fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  }
+                </button>
+
+                {/* Fullscreen */}
+                <button onClick={handleFullscreen} style={btnStyle}>
+                  <svg viewBox="0 0 24 24" style={iconStyle} fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/>
+                    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <style>{`
-        .project-frame {
-          position: relative; aspect-ratio: 2/3; overflow: hidden;
-          border: 1px solid rgba(232,213,163,0.1); cursor: none;
-          transition: border-color 0.4s ease, transform 0.4s ease; background: #111;
-        }
-        .project-frame::before {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(180deg, transparent 30%, rgba(8,8,8,0.95) 100%);
-          z-index: 2; transition: opacity 0.4s ease;
-        }
-        .project-frame:hover { border-color: rgba(232,213,163,0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(232,213,163,0.1); }
-        .project-frame:hover .project-title { text-shadow: 1.5px 0 rgba(193,68,14,0.5), -1.5px 0 rgba(0,150,200,0.3); }
-        .project-frame:hover > div:last-child { transform: translateY(0) !important; }
-        @media (max-width: 900px) {
-          .project-frame-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-      `}</style>
     </section>
   );
 }
+
+const btnStyle = {
+  background: 'none', border: 'none', cursor: 'pointer',
+  color: 'rgba(245,240,232,0.75)', padding: 4, display: 'flex',
+  alignItems: 'center', justifyContent: 'center',
+  transition: 'color 0.2s',
+};
+const iconStyle = { width: 18, height: 18, fill: 'currentColor' };

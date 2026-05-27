@@ -14,7 +14,7 @@ export default function CinemaRoom({ scrollProgressRef }) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(W, H);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.8;
+    renderer.toneMappingExposure = 0.9;
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x030303, 10, 22);
@@ -94,26 +94,18 @@ export default function CinemaRoom({ scrollProgressRef }) {
       for (let i = 0; i < 11; i++) scene.add(makeSeat((i - 5) * 0.80, -1.0, z));
     });
 
-    // ── WALL SCONCES ──
-    const sconceMat = new THREE.MeshStandardMaterial({
-      color: 0x2a1604, emissive: new THREE.Color(0xD4882A), emissiveIntensity: 1.5,
-    });
-    [-6.8, 6.8].forEach(wx => {
-      [3.0, 0.5, -2.0].forEach(wz => {
-        const cone = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.20, 7), sconceMat);
-        cone.position.set(wx, 2.6, wz); scene.add(cone);
-        const sl = new THREE.PointLight(0xD4882A, 8, 6);
-        sl.position.set(wx < 0 ? wx + 0.6 : wx - 0.6, 2.3, wz); scene.add(sl);
-      });
-    });
 
     // ── LIGHTING ──
-    scene.add(new THREE.HemisphereLight(0x3a2a10, 0x0a0504, 1.5));
-    scene.add(new THREE.AmbientLight(0x1a1008, 6));
-    const seatFill = new THREE.PointLight(0xD4A060, 12, 18);
+    scene.add(new THREE.HemisphereLight(0x1a1208, 0x050302, 1.0));
+    scene.add(new THREE.AmbientLight(0x0d0906, 4));
+    const seatFill = new THREE.PointLight(0xD4A060, 18, 20);
     seatFill.position.set(0, 4.0, 2.0); scene.add(seatFill);
-    const frontFill = new THREE.PointLight(0xC09050, 8, 12);
+    const frontFill = new THREE.PointLight(0xC09050, 12, 14);
     frontFill.position.set(0, 3.5, 5.0); scene.add(frontFill);
+    const sideFillL = new THREE.PointLight(0xB88040, 6, 12);
+    sideFillL.position.set(-5, 2.5, 2.0); scene.add(sideFillL);
+    const sideFillR = new THREE.PointLight(0xB88040, 6, 12);
+    sideFillR.position.set(5, 2.5, 2.0); scene.add(sideFillR);
     const projLight = new THREE.SpotLight(0xF2E4B8, 30, 30, Math.PI / 10, 0.25, 1.5);
     projLight.position.set(0, 7, 8);
     projLight.target.position.set(0, 3.2, -9);

@@ -36,7 +36,7 @@ export default function About() {
         el.insertBefore(document.createTextNode(char), cursor);
       }
       i++;
-      const delay = char === '\n' ? 80 : (char === '.' ? 300 : 28 + Math.random() * 20);
+      const delay = char === '\n' ? 18 : (char === '.' ? 60 : 8 + Math.random() * 6);
       setTimeout(typeNext, delay);
     }
 
@@ -57,7 +57,7 @@ export default function About() {
   return (
     <section id="about" ref={sectionRef} style={{ background: 'var(--bg2)', borderTop: '1px solid var(--separator)', padding: '100px 0' }}>
       <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+        <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
 
           {/* Screenplay block */}
           <div className="reveal">
@@ -107,7 +107,12 @@ export default function About() {
           </div>
         </div>
       </div>
-      <style>{`@keyframes blink { 50% { opacity: 0; } }`}</style>
+      <style>{`
+        @keyframes blink { 50% { opacity: 0; } }
+        @media (max-width: 768px) {
+          .about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+        }
+      `}</style>
     </section>
   );
 }

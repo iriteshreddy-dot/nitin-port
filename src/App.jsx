@@ -10,6 +10,7 @@ import Hero from './components/Hero';
 import Reel from './components/Reel';
 import About from './components/About';
 import Pipeline from './components/Pipeline';
+import SelectedWork from './components/SelectedWork';
 import Credits from './components/Credits';
 import Contact from './components/Contact';
 
@@ -42,6 +43,7 @@ export default function App() {
       <main>
         <Hero />
         <Reel />
+        <SelectedWork />
         <About />
         <Pipeline />
         <Credits />

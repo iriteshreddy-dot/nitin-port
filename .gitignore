@@ -5,6 +5,8 @@ dist/
 gemini-code-*.js
 gemini-code-*.json
 nitin-reel-scroll-prompt.md
+nitin-remotion-loader-prompt.md
+nitin-remotion-video-prompt.md
 html/
 index.html
 ChatGPT*.png
@@ -12,3 +14,14 @@ Countdown.jpg
 Reel.png
 .DS_Store
 *.local
+
+# Large video/image assets (hosted externally)
+*.mp4
+hit.jpg
+martin.jpg
+thuglife.jpg
+pushpa.2.jpg
+public/hit.jpg
+public/martin.jpg
+public/thuglife.jpg
+public/pushpa2.jpg

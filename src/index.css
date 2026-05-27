@@ -59,3 +59,14 @@
 @media (max-width: 900px) {
   .container { padding: 24px; }
 }
+
+/* Touch devices: restore native cursor */
+@media (pointer: coarse) {
+  body { cursor: auto; }
+  a, button { cursor: pointer !important; }
+}
+
+/* Small mobile */
+@media (max-width: 768px) {
+  .container { padding: 24px !important; }
+}
