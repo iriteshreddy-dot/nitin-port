@@ -14,13 +14,9 @@ Reel.png
 .DS_Store
 *.local
 
-# Large video/image assets (hosted externally)
+# Large video assets (hosted externally)
 *.mp4
-hit.jpg
-martin.jpg
-thuglife.jpg
-pushpa.2.jpg
-public/hit.jpg
-public/martin.jpg
-public/thuglife.jpg
-public/pushpa2.jpg
+/hit.jpg
+/martin.jpg
+/thuglife.jpg
+/pushpa.2.jpg
